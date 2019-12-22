@@ -17,6 +17,12 @@
 
 package io.shardingsphere.example.jdbc.nodep;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
 import io.shardingsphere.example.repository.api.service.CommonService;
 import io.shardingsphere.example.repository.jdbc.repository.JDBCOrderItemRepositoryImpl;
 import io.shardingsphere.example.repository.jdbc.repository.JDBCOrderRepositoryImpl;
@@ -25,61 +31,57 @@ import io.shardingsphere.example.type.ShardingType;
 import io.shardingsphere.shardingjdbc.api.yaml.YamlMasterSlaveDataSourceFactory;
 import io.shardingsphere.shardingjdbc.api.yaml.YamlShardingDataSourceFactory;
 
-import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-
 /*
  * Please make sure master-slave data sync on MySQL is running correctly. Otherwise this example will query empty data from slave.
  */
 public class YamlConfigurationExample {
-    
-    private static ShardingType type = ShardingType.SHARDING_DATABASES;
-//    private static ShardingType type = ShardingType.SHARDING_TABLES;
-//    private static ShardingType type = ShardingType.SHARDING_DATABASES_AND_TABLES;
-//    private static ShardingType type = ShardingType.MASTER_SLAVE;
-//    private static ShardingType type = ShardingType.SHARDING_MASTER_SLAVE;
-    
+
+    // private static ShardingType type = ShardingType.SHARDING_DATABASES;
+    // private static ShardingType type = ShardingType.SHARDING_TABLES;
+    private static ShardingType type = ShardingType.SHARDING_DATABASES_AND_TABLES;
+    // private static ShardingType type = ShardingType.MASTER_SLAVE;
+    // private static ShardingType type = ShardingType.SHARDING_MASTER_SLAVE;
+
     public static void main(final String[] args) throws SQLException, IOException {
         process(getDataSource());
     }
-    
+
     private static DataSource getDataSource() throws IOException, SQLException {
-        return ShardingType.MASTER_SLAVE == type ? YamlMasterSlaveDataSourceFactory.createDataSource(getYamlFile()) : YamlShardingDataSourceFactory.createDataSource(getYamlFile());
+        return ShardingType.MASTER_SLAVE == type ? YamlMasterSlaveDataSourceFactory.createDataSource(getYamlFile())
+                : YamlShardingDataSourceFactory.createDataSource(getYamlFile());
     }
-    
+
     private static File getYamlFile() {
         String result;
         switch (type) {
-            case SHARDING_DATABASES:
-                result = "/META-INF/sharding-databases.yaml";
-                break;
-            case SHARDING_TABLES:
-                result = "/META-INF/sharding-tables.yaml";
-                break;
-            case SHARDING_DATABASES_AND_TABLES:
-                result = "/META-INF/sharding-databases-tables.yaml";
-                break;
-            case MASTER_SLAVE:
-                result = "/META-INF/master-slave.yaml";
-                break;
-            case SHARDING_MASTER_SLAVE:
-                result = "/META-INF/sharding-master-slave.yaml";
-                break;
-            default:
-                throw new UnsupportedOperationException(type.name());
+        case SHARDING_DATABASES:
+            result = "/META-INF/sharding-databases.yaml";
+            break;
+        case SHARDING_TABLES:
+            result = "/META-INF/sharding-tables.yaml";
+            break;
+        case SHARDING_DATABASES_AND_TABLES:
+            result = "/META-INF/sharding-databases-tables.yaml";
+            break;
+        case MASTER_SLAVE:
+            result = "/META-INF/master-slave.yaml";
+            break;
+        case SHARDING_MASTER_SLAVE:
+            result = "/META-INF/sharding-master-slave.yaml";
+            break;
+        default:
+            throw new UnsupportedOperationException(type.name());
         }
         return new File(YamlConfigurationExample.class.getResource(result).getFile());
     }
-    
+
     private static void process(final DataSource dataSource) {
         CommonService commonService = getCommonService(dataSource);
         commonService.initEnvironment();
         commonService.processSuccess(false);
-        commonService.cleanEnvironment();
+        // commonService.cleanEnvironment();
     }
-    
+
     private static CommonService getCommonService(final DataSource dataSource) {
         return new RawPojoService(new JDBCOrderRepositoryImpl(dataSource), new JDBCOrderItemRepositoryImpl(dataSource));
     }

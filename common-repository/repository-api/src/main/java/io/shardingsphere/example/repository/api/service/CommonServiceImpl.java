@@ -17,17 +17,18 @@
 
 package io.shardingsphere.example.repository.api.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.transaction.annotation.Transactional;
+
 import io.shardingsphere.example.repository.api.entity.Order;
 import io.shardingsphere.example.repository.api.entity.OrderItem;
 import io.shardingsphere.example.repository.api.repository.OrderItemRepository;
 import io.shardingsphere.example.repository.api.repository.OrderRepository;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class CommonServiceImpl implements CommonService {
-    
+
     @Override
     public void initEnvironment() {
         getOrderRepository().createTableIfNotExists();
@@ -35,24 +36,24 @@ public abstract class CommonServiceImpl implements CommonService {
         getOrderRepository().truncateTable();
         getOrderItemRepository().truncateTable();
     }
-    
+
     @Override
     public void cleanEnvironment() {
         getOrderRepository().dropTable();
         getOrderItemRepository().dropTable();
     }
-    
+
     @Transactional
     @Override
     public void processSuccess(final boolean isRangeSharding) {
         System.out.println("-------------- Process Success Begin ---------------");
         List<Long> orderIds = insertData();
         printData(isRangeSharding);
-        deleteData(orderIds);
+        // deleteData(orderIds);
         printData(isRangeSharding);
         System.out.println("-------------- Process Success Finish --------------");
     }
-    
+
     @Transactional
     @Override
     public void processFailure() {
@@ -61,11 +62,13 @@ public abstract class CommonServiceImpl implements CommonService {
         System.out.println("-------------- Process Failure Finish --------------");
         throw new RuntimeException("Exception occur for transaction test.");
     }
-    
+
+    private static final int INSERT_NUM = 100;
+
     private List<Long> insertData() {
         System.out.println("---------------------------- Insert Data ----------------------------");
-        List<Long> result = new ArrayList<>(10);
-        for (int i = 1; i <= 10; i++) {
+        List<Long> result = new ArrayList<>(INSERT_NUM);
+        for (int i = 1; i <= INSERT_NUM; i++) {
             Order order = newOrder();
             order.setUserId(i);
             order.setStatus("INSERT_TEST");
@@ -79,7 +82,7 @@ public abstract class CommonServiceImpl implements CommonService {
         }
         return result;
     }
-    
+
     private void deleteData(final List<Long> orderIds) {
         System.out.println("---------------------------- Delete Data ----------------------------");
         for (Long each : orderIds) {
@@ -87,7 +90,7 @@ public abstract class CommonServiceImpl implements CommonService {
             getOrderItemRepository().delete(each);
         }
     }
-    
+
     @Override
     public void printData(final boolean isRangeSharding) {
         if (isRangeSharding) {
@@ -96,7 +99,7 @@ public abstract class CommonServiceImpl implements CommonService {
             printDataAll();
         }
     }
-    
+
     private void printDataRange() {
         System.out.println("---------------------------- Print Order Data -----------------------");
         for (Object each : getOrderRepository().selectRange()) {
@@ -107,7 +110,7 @@ public abstract class CommonServiceImpl implements CommonService {
             System.out.println(each);
         }
     }
-    
+
     private void printDataAll() {
         System.out.println("---------------------------- Print Order Data -----------------------");
         for (Object each : getOrderRepository().selectAll()) {
@@ -118,12 +121,12 @@ public abstract class CommonServiceImpl implements CommonService {
             System.out.println(each);
         }
     }
-    
+
     protected abstract OrderRepository getOrderRepository();
-    
+
     protected abstract OrderItemRepository getOrderItemRepository();
-    
+
     protected abstract Order newOrder();
-    
+
     protected abstract OrderItem newOrderItem();
 }

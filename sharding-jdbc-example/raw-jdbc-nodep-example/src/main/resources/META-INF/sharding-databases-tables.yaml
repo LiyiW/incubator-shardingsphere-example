@@ -1,33 +1,35 @@
 dataSources:
   ds_0: !!org.apache.commons.dbcp.BasicDataSource
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/demo_ds_0
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo_ds_0?useSSL=false
     username: root
-    password:
+    password: root
   ds_1: !!org.apache.commons.dbcp.BasicDataSource
-    driverClassName: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/demo_ds_1
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/demo_ds_1?useSSL=false
     username: root
-    password:
+    password: root
 
 shardingRule:
   tables:
-    t_order: 
+    t_order:
       actualDataNodes: ds_${0..1}.t_order_${0..1}
-      tableStrategy: 
+      tableStrategy:
         inline:
           shardingColumn: order_id
-          algorithmExpression: t_order_${order_id % 2}
+          # 直接模2散不开，跟snowflake算法低位sequence值生成有关
+          # 注意：这是groovy脚本。。。不能直接用除法"/"
+          algorithmExpression: t_order_${order_id.intdiv(10) % 2}
       keyGeneratorColumnName: order_id
     t_order_item:
       actualDataNodes: ds_${0..1}.t_order_item_${0..1}
       tableStrategy:
         inline:
           shardingColumn: order_id
-          algorithmExpression: t_order_item_${order_id % 2}  
+          algorithmExpression: t_order_item_${order_id.intdiv(10) % 2}
   bindingTables:
     - t_order,t_order_item
-  
+
   defaultDatabaseStrategy:
     inline:
       shardingColumn: user_id
@@ -35,6 +37,6 @@ shardingRule:
   defaultTableStrategy:
     none:
   defaultKeyGeneratorClassName: io.shardingsphere.core.keygen.DefaultKeyGenerator
-  
+
 props:
   sql.show: true

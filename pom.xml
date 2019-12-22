@@ -7,44 +7,44 @@
     <artifactId>sharding-sphere-example</artifactId>
     <version>3.1.0</version>
     <packaging>pom</packaging>
-    
+
     <modules>
         <module>common-repository</module>
         <module>example-utility</module>
         <module>sharding-jdbc-example</module>
         <module>sharding-proxy-example</module>
     </modules>
-    
+
     <properties>
         <java.version>1.7</java.version>
         <maven.version.range>[3.0.4,)</maven.version.range>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.locale>zh_CN</project.build.locale>
-        
+
         <sharding-sphere.version>3.1.0</sharding-sphere.version>
-    
+
         <aspectjweaver.version>1.8.9</aspectjweaver.version>
         <spring-framework.version>4.3.20.RELEASE</spring-framework.version>
         <spring-boot.version>1.5.17.RELEASE</spring-boot.version>
         <commons-dbcp.version>1.4</commons-dbcp.version>
-        <mysql-connector-java.version>5.1.42</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.11</mysql-connector-java.version>
         <postgresql.version>9.1-901-1.jdbc4</postgresql.version>
         <slf4j.version>1.7.7</slf4j.version>
         <logback.version>1.2.0</logback.version>
-        
+
         <mybatis.version>3.4.2</mybatis.version>
         <mybatis-spring.version>1.3.0</mybatis-spring.version>
         <jpa.version>1.0.0.Final</jpa.version>
         <hibernate.version>4.3.11.Final</hibernate.version>
-        
+
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <maven-resources-plugin.version>2.7</maven-resources-plugin.version>
         <maven-jar-plugin.version>2.6</maven-jar-plugin.version>
         <maven-source-plugin.version>2.4</maven-source-plugin.version>
-        
+
         <javadocExecutable>${java.home}/../bin/javadoc</javadocExecutable>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -112,7 +112,7 @@
                 <artifactId>sharding-orchestration-reg-etcd</artifactId>
                 <version>${sharding-sphere.version}</version>
             </dependency>
-    
+
             <dependency>
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjweaver</artifactId>
@@ -180,7 +180,7 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-    
+
     <dependencies>
         <dependency>
             <groupId>commons-dbcp</groupId>
@@ -202,8 +202,16 @@
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <optional>true</optional>
+        </dependency>
+
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -228,7 +236,7 @@
                 <version>${maven-jar-plugin.version}</version>
             </plugin>
             <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>${maven-source-plugin.version}</version>
                 <executions>
